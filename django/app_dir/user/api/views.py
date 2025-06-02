@@ -4,8 +4,10 @@ from rest_framework.generics import (
 )
 from django.db.models import Q
 from rest_framework import pagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.permissions import (IsAuthenticatedOrReadOnly, IsAuthenticated)
-from .serializers import UserSerializer, User
+from .serializers import UserDetailSerializer, UserSerializer, User
 from ...core.pagination import PostLimitOffsetPagination
 
 
@@ -56,3 +58,10 @@ class UpdateAPIView(RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserDetailSerializer(request.user)
+        return Response(serializer.data)

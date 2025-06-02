@@ -1,13 +1,18 @@
 import { useContext } from 'react';
 import { UserContext } from '../context/UserContext';
+import NotStaffDashboard from './NotStaffDashboard';
+import StaffDashboard from './StaffDashboard';
 
 const DashboardRoleNavigator = () => {
-  const { role } = useContext(UserContext);
-
-  console.log('ROLE', role);
+  const { isStaff } = useContext(UserContext);
 
   return (
     <>
+      {isStaff ? (
+        <StaffDashboard />
+      ) : (
+        <NotStaffDashboard />
+      )}
     </>
   );
 };

@@ -19,18 +19,25 @@ class UserSerializer(serializers.ModelSerializer):
         username = validated_data['username']
         email = validated_data['email']
         password = validated_data['password']
+        is_staff = validated_data.get('is_staff', False)
         user_obj = User(
             username=username,
             email=email,
-            is_staff=True
+            is_staff=is_staff
         )
         user_obj.set_password(password)
         user_obj.save()
-        return validated_data
+        return user_obj
 
     def update(self, instance, validated_data):
         instance.username = validated_data.get('username', instance.username)
         instance.email = validated_data.get('email', instance.email)
+        instance.is_staff = validated_data.get('is_staff', instance.is_staff)
         instance.save()
-
         return instance
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'is_staff']
+        read_only_fields = fields

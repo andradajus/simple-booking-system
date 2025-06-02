@@ -1,21 +1,22 @@
 import { createContext, useState, useEffect } from 'react';
-import { API } from '../api/api';
+import { api } from '../api/api';
 import propTypes from 'prop-types';
 import Cookies from 'js-cookie';
+import { AuthenticationAPI } from '../constants/constants';
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null);
+  const [isStaff, setIsStaff] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchCurrentUserDetails = async () => {
     setLoading(true);
     try {
-      const response = await API.getCurrentUserDetails();
+      const response = await api(AuthenticationAPI.ME, 'GET');
       setUser(response.data);
-      setRole(response.data.role);
+      setIsStaff(response.data.is_staff);
       setTimeout(() => {
         setLoading(false);
       }, 2500);
@@ -45,7 +46,7 @@ export const UserProvider = ({ children }) => {
         user,
         setUser,
         loading,
-        role,
+        isStaff,
       }}
     >
       {children}

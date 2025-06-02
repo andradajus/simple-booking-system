@@ -1,29 +1,30 @@
 import { useState, useEffect } from 'react';
-import { API } from '../api/api';
+import { api } from '../api/api';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { MdOutlineErrorOutline } from 'react-icons/md';
+import { AuthenticationAPI } from '../constants/constants';
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [FormData, setFormData] = useState({
-    user: {
-      login: '',
-      password: '',
-    },
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
   });
   const [error, setError] = useState(null);
 
   const loginHandler = async (e) => {
     e.preventDefault();
     try {
-      // const authenticated = await API.login(FormData);
+      const authenticated = await api(AuthenticationAPI.LOGIN, 'POST', {
+        username: formData.username,
+        password: formData.password,
+      });
       Cookies.set('Authorization', authenticated.data.token);
       navigate('/dashboard');
     } catch (error) {
-      console.log('errors', error.errors);
       setError('Login failed. Please try again.');
     }
   };
@@ -32,10 +33,7 @@ const Login = () => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      user: {
-        ...prevFormData.user,
-        [name]: value,
-      },
+      [name]: value,
     }));
     setError(null);
   };
@@ -63,18 +61,18 @@ const Login = () => {
             </div>
             <div className="flex flex-col">
               <label
-                htmlFor="login"
+                htmlFor="username"
                 className="pt-2 pb-2 border-gray-300 text-[#49454F]"
               >
-                Email or ID Number
+                Username
               </label>
               <input
-                name="login"
-                value={FormData.user.login}
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
                 className={`placeholder:text-sm p-2 rounded-full border border-gray-300 block w-full px-5 ${error ? 'border-2 border-red-500 focus:ring-0 focus:outline-0' : ''}`}
                 type="text"
-                placeholder="Email or ID Number"
+                placeholder="Username"
               />
             </div>
             <div className="flex flex-col relative">
@@ -87,7 +85,7 @@ const Login = () => {
               <div className="relative">
                 <input
                   name="password"
-                  value={FormData.user.password}
+                  value={formData.password}
                   onChange={handleChange}
                   className={`placeholder:text-sm p-2 rounded-full border border-gray-300 block w-full px-5 ${error ? 'border-2 border-red-500 focus:ring-0 focus:outline-0' : ''}`}
                   type={showPassword ? 'text' : 'password'}
