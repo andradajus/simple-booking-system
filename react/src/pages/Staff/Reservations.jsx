@@ -2,10 +2,17 @@ import { useEffect, useState, useMemo, useContext } from 'react';
 import { api } from '../../api/api';
 import { RoomsAPI } from '../../constants/constants';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay } from 'date-fns';
+import {
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  startOfMonth,
+  endOfMonth,
+} from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import enUS from 'date-fns/locale/en-US';
-import { UserContext } from '../../context/UserContext';
+import { AlertContext } from '../../context/AlertContext';
 
 const locales = {
   'en-US': enUS,
@@ -19,7 +26,7 @@ const localizer = dateFnsLocalizer({
 });
 
 const Reservations = () => {
-  const { showAlert } = useContext(UserContext);
+  const { showAlert } = useContext(AlertContext);
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [reservations, setReservations] = useState([]);
@@ -29,20 +36,35 @@ const Reservations = () => {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState('');
   const [calendarView, setCalendarView] = useState('month');
+  const [currentRange, setCurrentRange] = useState({
+    start: startOfMonth(new Date()),
+    end: endOfMonth(new Date()),
+  });
 
-  const handleSelectSlot = ({ start }) => {
-    if (!selecting) {
+  const handleSelectSlot = (slotInfo) => {
+    const start = slotInfo.start;
+    const end = slotInfo.end;
+
+    if (!selecting || startDate === null) {
       setStartDate(start);
       setEndDate(null);
       setSelecting(true);
     } else {
-      if (start >= startDate) {
-        setEndDate(start);
+      if (end >= startDate) {
+        setEndDate(end);
         setSelecting(false);
       } else {
         setStartDate(start);
         setEndDate(null);
       }
+    }
+  };
+
+  const handleRangeChange = (range) => {
+    if (Array.isArray(range)) {
+      setCurrentRange({ start: range[0], end: range[range.length - 1] });
+    } else if (range.start && range.end) {
+      setCurrentRange({ start: range.start, end: range.end });
     }
   };
 
@@ -66,43 +88,47 @@ const Reservations = () => {
       if (!selectedRoom) return;
       try {
         const url = RoomsAPI.ROOM_BOOKINGS.replace(':roomId', selectedRoom.id);
-        const params = calendarView === 'week' ? { view: 'weekly' } : {};
-        const res = await api(url, 'GET', null, params);
+        const params = {
+          start: currentRange.start.toISOString().slice(0, 10),
+          end: currentRange.end.toISOString().slice(0, 10),
+          ...(calendarView === 'week' ? { view: 'weekly' } : {}),
+        };
+        const res = await api(url, 'GET', null, {}, params);
         setReservations(res.data.results || res.data);
       } catch {
         setReservations([]);
       }
     };
     fetchReservations();
-  }, [selectedRoom, calendarView]);
+  }, [selectedRoom, calendarView, currentRange]);
 
   const events = useMemo(() => {
-  const baseEvents = reservations.map((r) => ({
-    title: r.user && r.user.username ? r.user.username : 'RESERVED',
-    start: new Date(r.start_date),
-    end: new Date(r.end_date),
-    allDay: true,
-  }));
-  if (startDate && selecting) {
-    baseEvents.push({
-      title: 'Your selection',
-      start: startDate,
-      end: startDate,
+    const baseEvents = reservations.map((r) => ({
+      title: r.user && r.user.username ? r.user.username : 'RESERVED',
+      start: new Date(r.start_date),
+      end: new Date(r.end_date),
       allDay: true,
-      isSelection: true,
-    });
-  }
-  if (startDate && endDate) {
-    baseEvents.push({
-      title: 'Your selection',
-      start: startDate,
-      end: endDate,
-      allDay: true,
-      isSelection: true,
-    });
-  }
-  return baseEvents;
-}, [reservations, startDate, endDate, selecting]);
+    }));
+    if (startDate && selecting) {
+      baseEvents.push({
+        title: 'Your selection',
+        start: startDate,
+        end: startDate,
+        allDay: true,
+        isSelection: true,
+      });
+    }
+    if (startDate && endDate) {
+      baseEvents.push({
+        title: 'Your selection',
+        start: startDate,
+        end: endDate,
+        allDay: true,
+        isSelection: true,
+      });
+    }
+    return baseEvents;
+  }, [reservations, startDate, endDate, selecting]);
 
   const eventStyleGetter = (event) => {
     if (event.isSelection) {
@@ -183,6 +209,7 @@ const Reservations = () => {
                   selectable
                   onSelectSlot={handleSelectSlot}
                   eventPropGetter={eventStyleGetter}
+                  onRangeChange={handleRangeChange}
                 />
                 {startDate && (
                   <div className="mt-4">
@@ -210,22 +237,31 @@ const Reservations = () => {
                           setBookingLoading(true);
                           setBookingError('');
                           try {
-                            const url = RoomsAPI.ROOM.replace(':roomId', selectedRoom.id) + 'reserve/';
-                            await api(
-                              url,
-                              'POST',
-                              {
-                                start_date: startDate
-                                  .toISOString()
-                                  .slice(0, 10),
-                                end_date: endDate.toISOString().slice(0, 10),
-                              }
-                            );
+                            const url =
+                              RoomsAPI.ROOM.replace(
+                                ':roomId',
+                                selectedRoom.id
+                              ) + 'reserve/';
+                            await api(url, 'POST', {
+                              start_date: startDate.toISOString().slice(0, 10),
+                              end_date: endDate.toISOString().slice(0, 10),
+                            });
                             setStartDate(null);
                             setEndDate(null);
                             setSelecting(false);
-                            const bookingsUrl = RoomsAPI.ROOM_BOOKINGS.replace(':roomId', selectedRoom.id);
-                            const params = calendarView === 'week' ? { view: 'weekly' } : {};
+                            const bookingsUrl = RoomsAPI.ROOM_BOOKINGS.replace(
+                              ':roomId',
+                              selectedRoom.id
+                            );
+                            const params = {
+                              ...(calendarView === 'week'
+                                ? { view: 'weekly' }
+                                : {}),
+                              start: currentRange.start
+                                .toISOString()
+                                .slice(0, 10),
+                              end: currentRange.end.toISOString().slice(0, 10),
+                            };
                             const res = await api(
                               bookingsUrl,
                               'GET',
@@ -239,7 +275,8 @@ const Reservations = () => {
                             );
                             showAlert({
                               type: 'error',
-                              message: err?.detail || 'Failed to book reservation',
+                              message:
+                                err?.detail || 'Failed to book reservation',
                             });
                           }
                           setBookingLoading(false);
