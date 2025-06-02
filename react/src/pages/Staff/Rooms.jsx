@@ -17,20 +17,24 @@ const Rooms = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Pagination
   const [page, setPage] = useState(1);
   const pageSize = 30;
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     fetchRooms(page);
-    // eslint-disable-next-line
   }, [page]);
 
   const fetchRooms = async (pageNum = 1) => {
     setLoading(true);
     try {
-      const res = await api(RoomsAPI.ROOMS, 'GET', null, {}, { page: pageNum, page_size: pageSize });
+      const res = await api(
+        RoomsAPI.ROOMS,
+        'GET',
+        null,
+        {},
+        { page: pageNum, page_size: pageSize }
+      );
       setRooms(res.data.results || res.data);
       setCount(res.data.count || 0);
     } catch {
@@ -45,7 +49,11 @@ const Rooms = () => {
     setError('');
     try {
       if (editingRoom) {
-        await api(RoomsAPI.ROOM.replace(':roomId', editingRoom.id) + 'update/', 'PUT', form);
+        await api(
+          RoomsAPI.ROOM.replace(':roomId', editingRoom.id) + 'update/',
+          'PUT',
+          form
+        );
         showAlert({ message: 'Room updated successfully!', type: 'success' });
       } else {
         await api(RoomsAPI.ROOMS + 'create/', 'POST', form);
@@ -57,7 +65,10 @@ const Rooms = () => {
       fetchRooms(page);
     } catch (err) {
       setError(err?.detail || 'Failed to save room');
-      showAlert({ message: err?.detail || 'Failed to save room', type: 'error' });
+      showAlert({
+        message: err?.detail || 'Failed to save room',
+        type: 'error',
+      });
     }
   };
 
@@ -78,11 +89,17 @@ const Rooms = () => {
       type: 'warning',
       onSuccess: async () => {
         try {
-          await api(RoomsAPI.ROOM.replace(':roomId', roomId) + 'delete/', 'DELETE');
+          await api(
+            RoomsAPI.ROOM.replace(':roomId', roomId) + 'delete/',
+            'DELETE'
+          );
           showAlert({ message: 'Room deleted successfully!', type: 'success' });
           fetchRooms(page);
         } catch (err) {
-          showAlert({ message: err?.detail || 'Failed to delete room', type: 'error' });
+          showAlert({
+            message: err?.detail || 'Failed to delete room',
+            type: 'error',
+          });
         }
       },
     });
@@ -95,7 +112,6 @@ const Rooms = () => {
     setError('');
   };
 
-  // Pagination controls
   const totalPages = Math.ceil(count / pageSize) || 1;
 
   return (
@@ -200,7 +216,9 @@ const Rooms = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-40">
-            <span className="text-blue-600 font-semibold text-lg animate-pulse">Loading...</span>
+            <span className="text-blue-600 font-semibold text-lg animate-pulse">
+              Loading...
+            </span>
           </div>
         ) : view === 'card' ? (
           <>

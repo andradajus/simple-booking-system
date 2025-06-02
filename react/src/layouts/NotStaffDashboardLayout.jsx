@@ -1,5 +1,13 @@
+import Navbar from '../components/Navbar';
+import StaffDashboard from '../pages/Staff/StaffDashboard';
+
 const NotStaffDashboardLayout = () => {
-  return <div>NotStaffDashboard</div>;
+  return (
+    <>
+      <Navbar />
+      <StaffDashboard />
+    </>
+  );
 };
 
 export default NotStaffDashboardLayout;

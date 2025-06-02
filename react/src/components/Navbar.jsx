@@ -18,12 +18,14 @@ const Navbar = () => {
         >
           Reservations
         </span>
-        <span
-          onClick={() => navigate('/dashboard/rooms')}
-          className="cursor-pointer hover:underline duration-300 ease-in-out hover:text-gray-300"
-        >
-          Rooms
-        </span>
+        {user.is_staff && (
+          <span
+            onClick={() => navigate('/dashboard/rooms')}
+            className="cursor-pointer hover:underline duration-300 ease-in-out hover:text-gray-300"
+          >
+            Rooms
+          </span>
+        )}
       </div>
 
       <div className="flex items-center space-x-4">
