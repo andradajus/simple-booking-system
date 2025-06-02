@@ -29,3 +29,15 @@ class Module(models.Model):
 
     def __str__(self):
         return self.name
+
+class Room(models.Model):
+    ROOM_TYPE_CHOICES = (
+        ('room', 'Room'),
+        ('tent', 'Tent'),
+    )
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=10, choices=ROOM_TYPE_CHOICES)
+    max_capacity = models.PositiveIntegerField()
+
+    def __str__(self):
+        return "{} ({})".format(self.name, self.get_type_display())

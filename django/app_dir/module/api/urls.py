@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (
    ModuleCreateAPIView,
    ModuleListAPIView,
@@ -12,5 +12,6 @@ urlpatterns = [
     path('create', ModuleCreateAPIView.as_view(), name='create'),
     path('delete/<int:pk>/', ModuleDeleteAPIView.as_view(), name='delete'),
     path('detail/<int:pk>/', ModuleDetailAPIView.as_view(), name='detail'),
-    path('update/<int:pk>/', ModuleUpdateAPIView.as_view(), name='update')
+    path('update/<int:pk>/', ModuleUpdateAPIView.as_view(), name='update'),
+    path('rooms/', include('app_dir.module.api.room.urls')),
 ]
