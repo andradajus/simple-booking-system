@@ -7,13 +7,7 @@ const DashboardRoleNavigator = () => {
   const { isStaff } = useContext(UserContext);
 
   return (
-    <>
-      {isStaff ? (
-        <StaffDashboardLayout />
-      ) : (
-        <NotStaffDashboardLayout />
-      )}
-    </>
+    <>{isStaff ? <StaffDashboardLayout /> : <NotStaffDashboardLayout />}</>
   );
 };
 

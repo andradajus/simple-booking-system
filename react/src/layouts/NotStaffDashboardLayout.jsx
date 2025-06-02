@@ -1,7 +1,5 @@
 const NotStaffDashboardLayout = () => {
-  return (
-    <div>NotStaffDashboard</div>
-  )
-}
+  return <div>NotStaffDashboard</div>;
+};
 
-export default NotStaffDashboardLayout
+export default NotStaffDashboardLayout;

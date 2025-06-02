@@ -39,6 +39,11 @@ export const api = async (
     return response;
   } catch (error) {
     console.log('Response error:', error);
+    if (error.response?.status === 401) {
+      Cookies.remove('Authorization');
+      window.location.href = '/login';
+      return;
+    }
     throw error.response?.data;
   }
 };

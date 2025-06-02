@@ -1,5 +1,5 @@
-import Navbar from '../components/Navbar'
-import StaffDashboard from '../pages/Staff/StaffDashboard'
+import Navbar from '../components/Navbar';
+import StaffDashboard from '../pages/Staff/StaffDashboard';
 
 const StaffDashboardLayout = () => {
   return (
@@ -7,7 +7,7 @@ const StaffDashboardLayout = () => {
       <Navbar />
       <StaffDashboard />
     </>
-  )
-}
+  );
+};
 
-export default StaffDashboardLayout
+export default StaffDashboardLayout;
