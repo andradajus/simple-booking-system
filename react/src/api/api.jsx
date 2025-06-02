@@ -3,10 +3,10 @@ import Cookies from 'js-cookie';
 
 const baseURL = import.meta.env.VITE_BACKEND_API_URL;
 
-const api = async (
+export const api = async (
   endpoint,
-  method,
-  body,
+  method = 'GET',
+  body = null,
   pathParams = {},
   params = {},
   customHeaders = {}
@@ -14,15 +14,13 @@ const api = async (
   const token = Cookies.get('Authorization');
   const isFormData = body instanceof FormData;
 
-  console.log('api params with id', pathParams, params);
-
   const url = endpoint.replace(/:\w+/g, (match) => {
     const key = match.slice(1);
     return pathParams[key] || match;
   });
 
   const headers = {
-    Authorization: `Bearer ${token}`,
+    ...(token && { Authorization: `Bearer ${token}` }),
     ...(isFormData
       ? { 'Content-Type': 'multipart/form-data' }
       : { 'Content-Type': 'application/json' }),
@@ -31,19 +29,21 @@ const api = async (
 
   try {
     const response = await axios({
-      method: method,
+      method,
       url: `${baseURL}${url}`,
-      headers: headers,
+      headers,
       data: body,
-      params: params,
+      params,
     });
 
     return response;
   } catch (error) {
-    console.log('Responce error:', error);
+    console.log('Response error:', error);
+    if (error.response?.status === 401) {
+      Cookies.remove('Authorization');
+      window.location.href = '/login';
+      return;
+    }
     throw error.response?.data;
   }
-};
-
-export const API = {
 };

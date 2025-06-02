@@ -32,4 +32,4 @@ class ModuleCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         TABLE.objects.create(**validated_data)
         return validated_data
-
+    
