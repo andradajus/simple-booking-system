@@ -17,9 +17,7 @@ export const UserProvider = ({ children }) => {
       const response = await api(AuthenticationAPI.ME, 'GET');
       setUser(response.data);
       setIsStaff(response.data.is_staff);
-      setTimeout(() => {
-        setLoading(false);
-      }, 2500);
+      setLoading(false);
       console.log('CURRENT_USER_DETAILS', response.data);
     } catch (error) {
       Cookies.remove('Authorization');
