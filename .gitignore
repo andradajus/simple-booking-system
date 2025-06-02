@@ -1,0 +1,67 @@
+ruby/.env
+ruby/config/credentials.yml.enc
+# Ignore Ruby and Rails specific files
+/.bundle
+/log/*
+!/log/.keep
+/tmp/*
+!/tmp/.keep
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/public/system
+/public/uploads
+
+# Ignore Rails storage and tmp folders (uploads, cache, etc)
+ruby/storage/
+/ruby/tmp/
+
+# Ignore Ruby version manager files
+/.rvmrc
+/.ruby-version
+/.ruby-gemset
+
+# Ignore Byebug command history file
+.byebug_history
+
+# Ignore editor swap and backup files
+*~
+*.swp
+*.swo
+.DS_Store
+
+# Ignore node_modules for React and JavaScript
+react/node_modules/
+
+# Ignore build artifacts
+react/build/
+react/dist/
+
+# Ignore log files and temp files in React
+react/log/
+react/tmp/
+
+# Ignore environment files
+.env
+.env.local
+.env.*.local
+
+# Ignore coverage reports and test artifacts
+coverage/
+spec/reports/
+
+# Ignore Docker-related files (if present)
+.dockerignore
+Dockerfile
+
+# Ignore any other system files you don't want
+*.log
+
+# Ignore yarn lock (if you want, but usually you commit this)
+# yarn.lock
+
+# Ignore package-lock.json (you have it in root)
+# package-lock.json
+# Ignore .env files everywhere except example or template
+**/.env
+**/.env.*
+ruby/config/credentials.yml.enc.bak

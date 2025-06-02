@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+.custom-list ul {
+  @apply list-disc list-inside pl-5;
+}
+
+.custom-list ol {
+  @apply list-decimal list-inside pl-5;
+}
+
+.tooltip-custom {
+  width: 12rem;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+}
+
+body,
+html,
+#root,
+* {
+  font-family: 'Poppins', sans-serif !important;
+}

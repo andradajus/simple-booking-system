@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: myappdb
+    ports:
+      - "5444:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    volumes:
+      - .:/app
+    links:
+      - redis
+      - db
+    command: python manage.py runserver 0.0.0.0:5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  redis:
+    image: redis:7
+
+volumes:
+  pgdata:
